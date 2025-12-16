@@ -120,6 +120,7 @@ async function ScrapeAirIndia(route) {
         "->",
         destination
       );
+      console.log(error.message);
     }
   }
   return [];

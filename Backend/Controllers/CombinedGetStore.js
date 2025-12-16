@@ -8,7 +8,8 @@ export const CombinedGetStore = async (req, res) => {
     const { origin, startDate, endDate, destination } = req.body;
 
     const results = {
-      indigo: { status: "pending", inserted: 0, errors: 0, total: 0 },
+      // indigo: { status: "pending", inserted: 0, errors: 0, total: 0 },
+      // todo this here needs to fix indigo pricing
       spicejet: { status: "pending", inserted: 0, errors: 0, total: 0 },
       akasa: { status: "pending", inserted: 0, errors: 0, total: 0 },
       airIndia: { status: "pending", inserted: 0, errors: 0, total: 0 },
@@ -16,26 +17,26 @@ export const CombinedGetStore = async (req, res) => {
 
     const promises = [
       // Indigo Promise
-      new Promise(async (resolve) => {
-        try {
-          const mockRes = {
-            status: (code) => ({
-              json: (data) => {
-                // ✅ Immediately resolve with captured data
-                resolve({
-                  success: true,
-                  statusCode: code,
-                  data: data,
-                });
-                return mockRes;
-              },
-            }),
-          };
-          await GetAndStoreFlightsIndigo(req, mockRes);
-        } catch (err) {
-          resolve({ success: false, error: err.message });
-        }
-      }),
+      // new Promise(async (resolve) => {
+      //   try {
+      //     const mockRes = {
+      //       status: (code) => ({
+      //         json: (data) => {
+      //           // ✅ Immediately resolve with captured data
+      //           resolve({
+      //             success: true,
+      //             statusCode: code,
+      //             data: data,
+      //           });
+      //           return mockRes;
+      //         },
+      //       }),
+      //     };
+      //     await GetAndStoreFlightsIndigo(req, mockRes);
+      //   } catch (err) {
+      //     resolve({ success: false, error: err.message });
+      //   }
+      // }),
 
       // SpiceJet Promise
 
@@ -102,32 +103,32 @@ export const CombinedGetStore = async (req, res) => {
       }),
     ];
 
-    const [indigoResponse, akasaResponse, spicejetResponse, AirIndiaResponse] =
+    const [ akasaResponse, spicejetResponse, AirIndiaResponse] =
       await Promise.allSettled(promises);
 
     // Process Indigo results
-    if (
-      indigoResponse.status === "fulfilled" &&
-      indigoResponse.value.success &&
-      indigoResponse.value.statusCode === 200
-    ) {
-      results.indigo = {
-        status: "success",
-        inserted: indigoResponse.value.data.inserted || 0,
-        errors: indigoResponse.value.data.errors || 0,
-        total: indigoResponse.value.data.total || 0,
-      };
-      console.log(`✅ Indigo: ${results.indigo.inserted} flights stored`);
-    } else {
-      results.indigo = {
-        status: "error",
-        message: indigoResponse.value?.error || "Failed to fetch",
-        inserted: 0,
-        errors: 0,
-        total: 0,
-      };
-      console.log(`❌ Indigo: Failed`);
-    }
+    // if (
+    //   indigoResponse.status === "fulfilled" &&
+    //   indigoResponse.value.success &&
+    //   indigoResponse.value.statusCode === 200
+    // ) {
+    //   results.indigo = {
+    //     status: "success",
+    //     inserted: indigoResponse.value.data.inserted || 0,
+    //     errors: indigoResponse.value.data.errors || 0,
+    //     total: indigoResponse.value.data.total || 0,
+    //   };
+    //   console.log(`✅ Indigo: ${results.indigo.inserted} flights stored`);
+    // } else {
+    //   results.indigo = {
+    //     status: "error",
+    //     message: indigoResponse.value?.error || "Failed to fetch",
+    //     inserted: 0,
+    //     errors: 0,
+    //     total: 0,
+    //   };
+    //   console.log(`❌ Indigo: Failed`);
+    // }
 
     // Process SpiceJet results
     if (
@@ -203,23 +204,22 @@ export const CombinedGetStore = async (req, res) => {
     // Calculate totals
     const totals = {
       inserted:
-        results.indigo.inserted +
+        // results.indigo.inserted +
         results.spicejet.inserted +
         results.akasa.inserted +
         results.airIndia.inserted,
       errors:
-        // here i hv removed spicejet for now lets see how the application performs
-        results.indigo.errors +
+        // results.indigo.errors +
         results.akasa.errors +
         results.spicejet.errors +
         results.airIndia.errors,
       total:
         results.spicejet.total +
-        results.indigo.total +
+        // results.indigo.total +
         results.akasa.total +
         results.airIndia.total,
       successfulAirlines: [
-        results.indigo.status === "success" ? "Indigo" : null,
+        // results.indigo.status === "success" ? "Indigo" : null,
         results.spicejet.status === "success" ? "SpiceJet" : null,
         results.akasa.status === "success" ? "Akasa" : null,
         results.airIndia.status === "success" ? "AirIndia" : null,
