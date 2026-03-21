@@ -36,7 +36,7 @@ export const GetFlightData = async (params) => {
       await new Promise((resolve) => setTimeout(resolve, randNumber()));
       const the_token = await fetchToken();
 
-      const url = "https://api-prod-booking-skyplus6e.goindigo.in/v1/getfarecalendar";
+      const url = "https://api-prod-flight-skyplus6e.goindigo.in/v1/flight/search`";
        
 
       const randUserAgent = randomUseragent.getRandom();
@@ -69,7 +69,7 @@ export const GetFlightData = async (params) => {
         endDate: endDate,
         status: "success",
         airline: "INDIGO",
-        data: axiosRes.data.data.lowFares,
+        data: axiosRes,
       };
     } catch (err) {
       lastError = err;
