@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 
-const client = new Redis();
+const client = new Redis({maxRetriesPerRequest:null});
 
 const time=new Date
 client.on("error", (err) => console.log("Redis Client Error", err));

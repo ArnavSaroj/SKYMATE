@@ -127,7 +127,7 @@ async function ScrapeAirIndia(route) {
 }
 
 export const StoreGetAirIndia = async (req, res) => {
-  const { origin, destination, startDate, endDate } = req.body;
+  const { airline,origin, destination, startDate, endDate } = req.body;
   if (!origin || !destination || !startDate || !endDate) {
     return res.status(400).json({ message: "incomplete or invalid body" });
   }

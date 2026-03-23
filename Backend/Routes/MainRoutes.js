@@ -34,7 +34,7 @@ router.post("/flights/spicejet/StoreGet", validateFlightRequest, GetAndStoreSpic
 
 router.post("/flights/akasa/StoreGet", validateFlightRequest, GetAndStoreAkasa);
 
-router.post("/flights/AirIndia/StoreGet", StoreGetAirIndia)
+router.post("/flights/airindia/StoreGet", StoreGetAirIndia)
 
 
 // this routes combines everything and also stores
