@@ -1,6 +1,8 @@
 import { Queue } from "bullmq";
 import client from "../../Config/redisConnect.js";
 import { ScrapingRoutes } from "../ScrapingRoutes.js";
+import { fileURLToPath } from 'url';
+
 
 const scrapeQueue = new Queue("ScrapingJobs", {
   connection: client,
@@ -17,7 +19,7 @@ const oneMonthAfterDate = oneMonthDate.toISOString().split("T")[0];
 
 const airlines = ["akasa", "airindia", "spicejet"];
 
-async function addJobs( ) {
+async function addJobs() {
   for (const airline of airlines) {
     for (const route of ScrapingRoutes) {
       await scrapeQueue.add(
@@ -29,7 +31,8 @@ async function addJobs( ) {
           startDate: formattedDate,
           endDate: oneMonthAfterDate,
         },
-        { jobId: `${airline}-${route.origin}-${route.destination}-${startDate}-${endDate}`,
+        {
+          jobId: `${airline}-${route.origin}-${route.destination}-${formattedDate}`,
           attempts: 2,
           backoff: {
             type: "exponential",
@@ -44,4 +47,5 @@ async function addJobs( ) {
     }
   }
 }
-addJobs();
+
+addJobs()

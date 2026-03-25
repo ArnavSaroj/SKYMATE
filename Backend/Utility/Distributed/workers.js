@@ -2,6 +2,7 @@ import { Worker } from "bullmq";
 import client from "../../Config/redisConnect.js";
 import axios from "axios";
 
+
 async function callAirlineApi(airline, route) {
   try {
     const res = await axios.post(
@@ -50,11 +51,12 @@ const worker = new Worker(
     const route = Job.data;
     const airline = route.airline;
     const supportedAirlines = ["airindia", "akasa", "spicejet"];
-
+    console.log("Started Processing Jobs");
     if (!supportedAirlines.includes(airline)) {
       throw new Error("Unsupported airline");
     }
     await callAirlineApi(airline, route);
   },
-  { connection: client, concurrency: 5 },
+  { connection: client, concurrency: 3 },
 );
+
