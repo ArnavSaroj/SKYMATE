@@ -2,7 +2,6 @@ import { Worker } from "bullmq";
 import client from "../../Config/redisConnect.js";
 import axios from "axios";
 
-
 async function callAirlineApi(airline, route) {
   try {
     const res = await axios.post(
@@ -57,6 +56,12 @@ const worker = new Worker(
     }
     await callAirlineApi(airline, route);
   },
-  { connection: client, concurrency: 3 },
+  {
+    connection: client,
+    concurrency: 2,
+    limiter: {
+      max: 10,
+      duration: 1000,
+    },
+  },
 );
-

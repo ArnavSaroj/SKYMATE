@@ -65,7 +65,7 @@ export const GetFlightDataSpicejet = async (params) => {
             "Accept-Language": acceptLanguage,
           },
           timeout: 7000,
-        }
+        },
       );
       const formattedData = axiosRes.data.data.lowFareDateMarkets.map(
         (entry) => ({
@@ -74,7 +74,7 @@ export const GetFlightDataSpicejet = async (params) => {
             ? entry.lowestFareAmount.fareAmount +
               entry.lowestFareAmount.taxesAndFeesAmount
             : null,
-        })
+        }),
       );
 
       return {
@@ -135,7 +135,7 @@ export const SpicejetSpecific = async (req, res) => {
             "Accept-Language": acceptLanguage,
           },
           timeout: 7000,
-        }
+        },
       );
       const formattedData = axiosRes.data.data.lowFareDateMarkets.map(
         (entry) => ({
@@ -144,7 +144,7 @@ export const SpicejetSpecific = async (req, res) => {
             ? entry.lowestFareAmount.fareAmount +
               entry.lowestFareAmount.taxesAndFeesAmount
             : null,
-        })
+        }),
       );
 
       return res.status(200).json({
@@ -178,7 +178,15 @@ export const GetAndStoreSpicejet = async (req, res) => {
   let lastError;
   while (attempt--) {
     try {
-      const { origin, destination, startDate } = req.body;
+      let { origin, destination, startDate } = req.body;
+
+      if (origin == "GOI") {
+        origin = "GOX";
+      }
+      if (destination == "GOI") {
+        destination = "GOX";
+      }
+
       await new Promise((resolve) => setTimeout(resolve, randNumber()));
       const the_token = await fetchSpicejetToken();
 
@@ -213,7 +221,7 @@ export const GetAndStoreSpicejet = async (req, res) => {
             "Accept-Language": acceptLanguage,
           },
           timeout: 7000,
-        }
+        },
       );
       const formattedData = axiosRes.data.data.lowFareDateMarkets.map(
         (entry) => ({
@@ -222,7 +230,7 @@ export const GetAndStoreSpicejet = async (req, res) => {
             ? entry.lowestFareAmount.fareAmount +
               entry.lowestFareAmount.taxesAndFeesAmount
             : null,
-        })
+        }),
       );
 
       const flightData = formattedData;

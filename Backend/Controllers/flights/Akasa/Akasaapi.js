@@ -131,7 +131,16 @@ export const GetAndStoreAkasa = async (req, res) => {
   while (attempt--) {
     await new Promise((resolve) => setTimeout(resolve, randNumber()));
     try {
-      const { origin, destination, startDate, endDate } = req.body;
+      let { origin, destination, startDate, endDate } = req.body;
+      if(origin=="GOI"){
+        origin="GOX";
+      }
+       if(destination=="GOI"){
+        destination="GOX";
+      }
+      if(origin=="JAI"||destination=="JAI"){
+        return res.status(400).json({message:"airline not supported"});
+      }
       const encodedDate = attachEncodedTime(startDate);
       const endDateObj = endDate ? new Date(endDate) : null;
 
@@ -154,6 +163,8 @@ export const GetAndStoreAkasa = async (req, res) => {
         timeout: 10000,
         responseType: "stream",
       });
+
+      
  const pipeline = chain([
         axiosRES.data,
         parser(),
