@@ -20,7 +20,10 @@ const airlines = ["akasa", "airindia", "spicejet"];
 let expectedTotalJobs = 0;
 
 async function addJobs() {
+
   await scrapeQueue.drain(true);
+
+  
   const totalJobs = airlines.length * ScrapingRoutes.length;
   expectedTotalJobs = totalJobs;
   console.log(`Total jobs to be queued: ${totalJobs}`);

@@ -4,6 +4,9 @@ import randomUseragent from "random-useragent";
 import fetchSpicejetToken from "../../../Auth/Spicejt/fetchSpicejetToken.js";
 import axios from "axios";
 import { supabase } from "../../../Config/supabaseClient.js";
+import plimit from 'p-limit'
+
+const insertLimit=plimit(10)
 
 const languages = [
   "en-US,en;q=0.9",
@@ -174,7 +177,7 @@ export const SpicejetSpecific = async (req, res) => {
 };
 
 export const GetAndStoreSpicejet = async (req, res) => {
-  let attempt = 8;
+  let attempt = 5;
   let lastError;
   while (attempt--) {
     try {
@@ -187,7 +190,7 @@ export const GetAndStoreSpicejet = async (req, res) => {
         destination = "GOX";
       }
 
-      await new Promise((resolve) => setTimeout(resolve, randNumber()));
+      // await new Promise((resolve) => setTimeout(resolve, randNumber()));
       const the_token = await fetchSpicejetToken();
 
       const url = "https://www.spicejet.com/api/v2/search/lowfare";
@@ -220,7 +223,7 @@ export const GetAndStoreSpicejet = async (req, res) => {
             Accept: "*/*",
             "Accept-Language": acceptLanguage,
           },
-          timeout: 7000,
+          timeout: 4000,
         },
       );
       const formattedData = axiosRes.data.data.lowFareDateMarkets.map(
@@ -233,40 +236,44 @@ export const GetAndStoreSpicejet = async (req, res) => {
         }),
       );
 
+     
       const flightData = formattedData;
 
       let errorCount = 0;
       let successCount = 0;
 
-      for (const flight of flightData) {
-        try {
-          if (
-            !flight.price ||
-            isNaN(parseInt(flight.price)) ||
-            parseInt(flight.price) <= 0
-          ) {
-            errorCount++;
-            continue;
-          }
-          const { data, error } = await supabase.rpc("insert_flight_price", {
-            _airline: "spicejet",
-            _origin: origin,
-            _destination: destination,
-            _departure_date: flight.date,
-            _price: parseInt(flight.price),
-            _source_site: "spicejet",
-          });
-          if (error) {
-            console.error("database error:", error.message);
-            errorCount++;
-          } else {
-            successCount++;
-          }
-        } catch (storeErr) {
-          errorCount++;
-          console.error("storage error:", storeErr.message);
-        }
-      }
+      await Promise.all(
+        flightData.map((flight) =>
+          insertLimit(async () => {
+            try {
+              const price = parseInt(flight.price);
+              if (!price || isNaN(price) || price <= 0) {
+                errorCount++;
+                return;
+              }
+
+              const { error } = await supabase.rpc("insert_flight_price", {
+                _airline: "spicejet",
+                _origin: origin,
+                _destination: destination,
+                _departure_date: flight.date,
+                _price: price,
+                _source_site: "spicejet",
+              });
+
+              if (error) {
+                console.error("database error:", error.message);
+                errorCount++;
+              } else {
+                successCount++;
+              }
+            } catch (storeErr) {
+              errorCount++;
+              console.error("storage error:", storeErr.message);
+            }
+          }),
+        ),
+      );
 
       return res.status(200).json({
         status: "success",

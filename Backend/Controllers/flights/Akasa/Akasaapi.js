@@ -121,7 +121,7 @@ export const AkasaDataSpecific = async (req, res) => {
 // still some bugs are there
 
 export const GetAndStoreAkasa = async (req, res) => {
-  let attempt = 7;
+  let attempt = 4;
   let lasterror;
 
   let successCount = 0;
@@ -129,7 +129,10 @@ export const GetAndStoreAkasa = async (req, res) => {
   let totalProcessed = 0;
 
   while (attempt--) {
+    if(attempt>1){
     await new Promise((resolve) => setTimeout(resolve, randNumber()));
+
+    }
     try {
       let { origin, destination, startDate, endDate } = req.body;
       if(origin=="GOI"){
@@ -160,7 +163,7 @@ export const GetAndStoreAkasa = async (req, res) => {
           Pragma: "no-cache",
           "Cache-Control": "no-cache",
         },
-        timeout: 10000,
+        timeout: 5000,
         responseType: "stream",
       });
 

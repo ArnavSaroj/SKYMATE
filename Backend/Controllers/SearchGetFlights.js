@@ -1,4 +1,5 @@
 import { supabase } from "../Config/supabaseClient.js";
+import client from "../Config/redisConnect.js";
 
 const SearchGetFlights = async (req, res) => {
   const { from, to, departure, returnDate } = req.query;
@@ -8,6 +9,12 @@ const SearchGetFlights = async (req, res) => {
   }
 
   try {
+const key=`${from}-${to}-${departure}-${returnDate}`
+
+    const cachedFlights = await client.get(key);
+
+    if (cachedFlights) {
+return res.status(200).json(JSON.parse(cachedFlights));    }
     const { data, error } = await supabase
       .from("flight_prices_full")
       .select("*")
@@ -19,8 +26,11 @@ const SearchGetFlights = async (req, res) => {
 
     if (error) throw error;
 
+    await client.set(key,JSON.stringify({flights:data}),"EX",3000)
+
     return res.status(200).json({ flights: data });
   } catch (error) {
+    console.log(error)
     return res.status(500).json({ message: error.message });
   }
 };

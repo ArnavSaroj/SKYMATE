@@ -20,7 +20,7 @@ async function callAirlineApi(airline, route) {
 
     const data = res.data;
     console.log(
-      `Job Completed: AirIndia ${route.origin} → ${route.destination}`,
+      `Job Completed: ${airline} ${route.origin} → ${route.destination}`,
     );
     if (data && typeof data === "object") {
       console.log(`Inserted: ${data.inserted || 0}`);
@@ -58,7 +58,7 @@ const worker = new Worker(
   },
   {
     connection: client,
-    concurrency: 2,
+    concurrency: 3,
     limiter: {
       max: 10,
       duration: 1000,
