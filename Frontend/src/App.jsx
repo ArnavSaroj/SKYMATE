@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout.jsx";
 import SignUpPage from "./pages/Signup.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthContext } from "./context/AuthContext.jsx";
 import FullDealsPage from "./pages/FullDealsPage.jsx";
 import { ToastContainer } from "react-toastify";
@@ -9,6 +9,9 @@ import BookmarksPage from "./pages/BookmarksPage.jsx";
 
 function App() {
   const [User, setUser] = useState(null);
+  useEffect(() => {
+    fetch("https://skymate-backend-only.onrender.com/health").catch(() => {});
+  }, []);
   return (
     <Router>
       <div className="flex min-h-svh flex-col i">
