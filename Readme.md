@@ -6,6 +6,25 @@ SkyMate is a comprehensive flight search and booking platform designed to simpli
 
 -----
 
+## Architecture Flow
+
+![Skymate Architecture Flow](./Frontend/src/assets/architectureFlow.png)
+
+The architecture of SkyMate is designed for scalability and efficiency. Here's a breakdown of the flow:
+
+1. **Route Scheduler**: The process begins with the Route Scheduler, which identifies popular flight routes to be scraped.
+2. **Job Queues**: These routes are then sent to BullMQ, which acts as a job queue, managing the scraping tasks.
+3. **Workers**: Multiple workers pick up jobs from the queue. Each worker is responsible for scraping data from a specific airline.
+4. **Worker Processing Pipeline**:
+    * **Rate Limiter**: To avoid overwhelming the airline's servers, each worker has a rate limiter.
+    * **Scraping Engine**: This engine fetches the raw flight data from the airline's website.
+    * **Data Extraction**: The relevant information (like flight times, prices, etc.) is extracted from the raw data.
+    * **Price Validation & Data Normalization**: The extracted data is then validated and normalized to ensure consistency across different airlines.
+5. **Postgres SQL DB**: The cleaned and processed data is stored in a PostgreSQL database.
+6. **Serve in Frontend**: Finally, the data from the database is served to the frontend, where users can search and compare flight prices.
+
+-----
+
 ## Features
 
   - ✨ **Comprehensive Flight Search:** Search for flights across multiple airlines (Akasa, Indigo, Spicejet) simultaneously.
